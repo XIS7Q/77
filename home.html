@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💳 记账小程序 - 在线版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'PingFang SC', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .features {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .comparison {
+            padding: 80px 20px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .comparison-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .checkmark {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .cross {
+            color: #f44336;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .how-to-use {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .step {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .step h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .step p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .screenshots {
+            padding: 80px 20px;
+        }
+
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .screenshot-card {
+            background: #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .screenshot-placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .screenshot-card h3 {
+            padding: 20px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .footer {
+            background: #333;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+        }
+
+        .footer-section a {
+            color: #aaa;
+            text-decoration: none;
+            display: block;
+            margin: 8px 0;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #555;
+            padding-top: 20px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .section-title {
+            font-size: 36px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .hero h2 {
+                font-size: 32px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 12px 8px;
+                font-size: 13px;
+            }
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <h1>💳 记账小程序</h1>
+        <div class="nav-links">
+            <a href="#features">功能</a>
+            <a href="#comparison">对比</a>
+            <a href="#how-to-use">教程</a>
+            <a href="https://github.com/XIS7Q/77" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <!-- 英雄区 -->
+    <section class="hero">
+        <h2>智能记账，轻松理财</h2>
+        <p>支持Web版和桌面版，随时随地管理你的消费记录</p>
+        <div class="hero-buttons">
+            <a href="index.html" class="btn btn-primary">📱 立即使用Web版</a>
+            <a href="https://github.com/XIS7Q/77" class="btn btn-secondary">💻 下载桌面版</a>
+        </div>
+    </section>
+
+    <!-- 功能区 -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">✨ 核心功能</h2>
+            <p class="section-subtitle">强大的功能让记账变得简单有趣</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>手动记账</h3>
+                    <p>快速记录每一笔消费，支持分类、备注和日期选择</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>数据统计</h3>
+                    <p>实时统计总支出、平均消费，了解消费趋势</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3>可视化图表</h3>
+                    <p>支持饼图、柱状图等多种图表，直观展示数据</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>多平台支持</h3>
+                    <p>Web版支持手机、平板、电脑，桌面版功能更强大</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>数据安全</h3>
+                    <p>数据存储在本地，永不上云，完全隐私保护</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📥</div>
+                    <h3>导出功能</h3>
+                    <p>支持导出为CSV格式，方便数据分析和备份</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📷</div>
+                    <h3>OCR识别</h3>
+                    <p>桌面版支持扫描支付截图，自动提取交易信息</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🏷️</div>
+                    <h3>智能分类</h3>
+                    <p>多种消费分类，支持自定义和自动识别</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>快速便捷</h3>
+                    <p>简洁的界面设计，1秒钟添加一条记录</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 版本对比 -->
+    <section class="comparison" id="comparison">
+        <div class="container">
+            <h2 class="section-title">🔄 版本对比</h2>
+            <p class="section-subtitle">选择最适合你的版本</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>功能</th>
+                        <th>Web版 (推荐)</th>
+                        <th>桌面版</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>手动记账</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>手机支持</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>无需安装</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="cross">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td>无需登录</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>离线使用</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>数据统计</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>图表分析</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>导出CSV</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>OCR识别</td>
+                        <td><span class="cross">✗</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>高级可视化</td>
+                        <td><span class="checkmark">✓</span></td>
+                        <td><span class="checkmark">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 使用教程 -->
+    <section class="how-to-use" id="how-to-use">
+        <div class="container">
+            <h2 class="section-title">📖 使用教程</h2>
+            <p class="section-subtitle">快速上手，5分钟学会使用</p>
+
+            <h3 style="margin-top: 40px; margin-bottom: 20px;">🌐 Web版使用步骤</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>打开网站</h3>
+                    <p>直接点击"立即使用Web版"按钮，在浏览器中打开应用</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>选择日期和金额</h3>
+                    <p>填写消费日期和金额，支持小数点</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>选择分类</h3>
+                    <p>从下拉菜单选择消费分类（餐饮、购物等）</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>添加备注</h3>
+                    <p>可选：添加备注信息，方便记忆</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <h3>查看统计</h3>
+                    <p>点击"统计分析"查看消费数据和图表</p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <h3>导出数据</h3>
+                    <p>点击"导出数据"下载CSV文件备份</p>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px; margin-bottom: 20px;">💻 桌面版安装步骤</h3>
+            <div class="code-block">
+# 1. 克隆仓库
+git clone https://github.com/XIS7Q/77.git
+cd 77
+
+# 2. 安装依赖
+pip install -r requirements.txt
+
+# 3. 运行程序
+python main.py
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>📱 产品</h3>
+                <a href="index.html">Web版本</a>
+                <a href="https://github.com/XIS7Q/77">桌面版本</a>
+                <a href="https://github.com/XIS7Q/77/blob/main/README.md">完整文档</a>
+            </div>
+
+            <div class="footer-section">
+                <h3>🔗 链接</h3>
+                <a href="https://github.com/XIS7Q/77" target="_blank">GitHub仓库</a>
+                <a href="https://github.com/XIS7Q/77/issues" target="_blank">问题反馈</a>
+                <a href="https://github.com/XIS7Q" target="_blank">作者主页</a>
+            </div>
+
+            <div class="footer-section">
+                <h3>ℹ️ 信息</h3>
+                <a href="#">使用条款</a>
+                <a href="#">隐私政策</a>
+                <a href="#">关于我们</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 记账小程序 | 开源免费 | <a href="https://github.com/XIS7Q/77" target="_blank" style="color: #667eea;">Star on GitHub ⭐</a></p>
+        </div>
+    </footer>
+</body>
+</html>
