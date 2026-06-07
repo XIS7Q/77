@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>记账小程序 - Web版</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>💳 记账小程序</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
@@ -19,11 +22,24 @@
             --border-color: #ddd;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'PingFang SC', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'PingFang SC', 'Helvetica Neue', sans-serif;
             background-color: var(--light-bg);
             color: #333;
             line-height: 1.6;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        input, select, textarea, button {
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .container {
@@ -35,7 +51,7 @@
         .header {
             background: linear-gradient(135deg, var(--primary-color) 0%, #45a049 100%);
             color: white;
-            padding: 20px 10px;
+            padding: 25px 10px;
             text-align: center;
             margin-bottom: 20px;
             border-radius: 8px;
@@ -43,8 +59,14 @@
         }
 
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
         }
 
         .form-card {
@@ -61,6 +83,11 @@
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--primary-color);
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
         }
 
         .form-row {
@@ -71,18 +98,29 @@
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
+            margin-bottom: 6px;
+            font-weight: 600;
             font-size: 14px;
             color: #555;
         }
 
         input, select {
             width: 100%;
-            padding: 10px;
+            padding: 12px 10px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 14px;
+            font-family: inherit;
+            background-color: white;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232196F3' d='M0 3l6 6 6-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
         }
 
         input:focus, select:focus {
@@ -98,8 +136,12 @@
             margin-top: 20px;
         }
 
+        .button-group.full {
+            grid-template-columns: 1fr;
+        }
+
         button {
-            padding: 12px 20px;
+            padding: 14px 20px;
             border: none;
             border-radius: 4px;
             font-size: 14px;
@@ -117,6 +159,10 @@
             background-color: #45a049;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
@@ -141,13 +187,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--light-bg);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
         }
 
         .stat-label {
             font-weight: 500;
             color: #666;
+            font-size: 15px;
         }
 
         .stat-value {
@@ -180,37 +231,51 @@
 
         th {
             background-color: var(--light-bg);
-            padding: 10px;
+            padding: 12px 8px;
             text-align: left;
             font-weight: 600;
             border-bottom: 2px solid var(--border-color);
             font-size: 13px;
+            color: #555;
         }
 
         td {
-            padding: 12px 10px;
+            padding: 14px 8px;
             border-bottom: 1px solid var(--border-color);
             font-size: 13px;
+        }
+
+        tr:hover {
+            background-color: #fafafa;
         }
 
         .amount {
             color: var(--danger-color);
             font-weight: bold;
+            font-size: 14px;
         }
 
         .category-badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 5px 10px;
             background-color: var(--info-color);
             color: white;
-            border-radius: 4px;
+            border-radius: 12px;
             font-size: 12px;
+            font-weight: 500;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 50px 20px;
             color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
 
         .modal {
@@ -224,6 +289,7 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            padding: 10px;
         }
 
         .modal.active {
@@ -234,9 +300,33 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            max-width: 90%;
-            max-height: 90vh;
+            max-width: 100%;
+            width: 100%;
+            max-height: 85vh;
             overflow-y: auto;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            margin: -10px -10px 10px 0;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
         }
 
         .toast {
@@ -245,12 +335,13 @@
             right: 20px;
             background-color: var(--primary-color);
             color: white;
-            padding: 15px 20px;
+            padding: 16px 20px;
             border-radius: 4px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             display: none;
             animation: slideIn 0.3s ease;
             z-index: 2000;
+            font-size: 14px;
         }
 
         .toast.show {
@@ -276,46 +367,85 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
+
             .button-group {
                 grid-template-columns: 1fr;
             }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header {
+                padding: 20px 10px;
+            }
+
+            th, td {
+                padding: 10px 6px;
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 8px;
+            }
+
+            .form-card, .table-card, .stats-card {
+                padding: 12px;
+            }
         }
 
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: white;
-            padding: 6px 10px;
-            font-size: 12px;
-        }
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
 
-        .btn-danger:hover {
-            background-color: #da190b;
+            button {
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+
+            input, select {
+                padding: 10px 8px;
+            }
+
+            .modal-content {
+                max-height: 90vh;
+            }
+
+            .toast {
+                right: 10px;
+                left: 10px;
+                margin-right: 0;
+                width: auto;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 头部 -->
         <div class="header">
             <h1>💳 记账小程序</h1>
             <p>轻松管理你的消费</p>
         </div>
 
+        <!-- 表单区域 -->
         <div class="form-card">
             <div class="form-title">📝 新增记录</div>
             
             <div class="form-row">
-                <div>
+                <div class="form-group">
                     <label for="date">日期</label>
                     <input type="date" id="date" required>
                 </div>
-                <div>
+                <div class="form-group">
                     <label for="amount">金额 (¥)</label>
-                    <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01" min="0" required>
                 </div>
             </div>
 
             <div class="form-row">
-                <div>
+                <div class="form-group">
                     <label for="category">分类</label>
                     <select id="category" required>
                         <option value="餐饮">🍜 餐饮</option>
@@ -327,7 +457,7 @@
                         <option value="其他">📄 其他</option>
                     </select>
                 </div>
-                <div>
+                <div class="form-group">
                     <label for="note">备注</label>
                     <input type="text" id="note" placeholder="可不填">
                 </div>
@@ -338,11 +468,12 @@
                 <button class="btn-secondary" onclick="showStatistics()">📊 统计分析</button>
             </div>
             
-            <div style="margin-top: 10px;">
-                <button class="btn-secondary" onclick="exportCSV()" style="width: 100%;">📥 导出数据</button>
+            <div class="button-group full">
+                <button class="btn-secondary" onclick="exportCSV()">📥 导出数据</button>
             </div>
         </div>
 
+        <!-- 统计信息 -->
         <div class="stats-card">
             <div class="stat-item">
                 <span class="stat-label">💰 总消费</span>
@@ -358,27 +489,35 @@
             </div>
         </div>
 
+        <!-- 表格区域 -->
         <div class="table-card">
             <div class="table-title">📊 消费记录</div>
             <div id="tableContainer"></div>
         </div>
     </div>
 
+    <!-- 统计模态框 -->
     <div class="modal" id="statisticsModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 20px;">📊 统计分析</h2>
-            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
-            <div id="categoryStats" style="margin-top: 20px;"></div>
+            <button class="close-btn" onclick="closeStatistics()">×</button>
+            <h2 style="margin-bottom: 20px; margin-top: 10px;">📊 统计分析</h2>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div id="categoryStats"></div>
             <button class="btn-primary" onclick="closeStatistics()" style="width: 100%; margin-top: 20px;">关闭</button>
         </div>
     </div>
 
+    <!-- 活动提示框 -->
     <div class="toast" id="toast"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script>
-        const storageKey = 'expense_records';
-        
+        const storageKey = 'expense_records_v1';
+        let chartInstance = null;
+
+        // 页面加载时设置日期并更新UI
         window.addEventListener('load', function() {
             const dateInput = document.getElementById('date');
             if (!dateInput.value) {
@@ -387,6 +526,7 @@
             updateUI();
         });
 
+        // 添加记录
         function addRecord() {
             const date = document.getElementById('date').value;
             const amount = parseFloat(document.getElementById('amount').value);
@@ -409,8 +549,9 @@
             });
 
             localStorage.setItem(storageKey, JSON.stringify(records));
-            showToast('记录已添加');
+            showToast('✓ 记录已添加');
             
+            // 清空表单
             document.getElementById('amount').value = '';
             document.getElementById('note').value = '';
             document.getElementById('date').value = new Date().toISOString().split('T')[0];
@@ -418,17 +559,20 @@
             updateUI();
         }
 
+        // 获取所有记录
         function getRecords() {
             const data = localStorage.getItem(storageKey);
             return data ? JSON.parse(data) : [];
         }
 
+        // 更新UI
         function updateUI() {
             const records = getRecords();
             updateStats(records);
             updateTable(records);
         }
 
+        // 更新统计信息
         function updateStats(records) {
             if (records.length === 0) {
                 document.getElementById('totalAmount').textContent = '¥0.00';
@@ -445,6 +589,7 @@
             document.getElementById('averageAmount').textContent = `¥${average.toFixed(2)}`;
         }
 
+        // 更新表格
         function updateTable(records) {
             const container = document.getElementById('tableContainer');
 
@@ -476,7 +621,7 @@
                         <td><span class="category-badge">${record.category}</span></td>
                         <td class="amount">¥${record.amount.toFixed(2)}</td>
                         <td>${record.note || '-'}</td>
-                        <td><button class="btn-danger" onclick="deleteRecord(${record.id})">×</button></td>
+                        <td><button class="btn-danger" onclick="deleteRecord(${record.id})" style="background-color: #f44336; color: white; padding: 6px 10px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer;">删除</button></td>
                     </tr>
                 `;
             });
@@ -489,15 +634,17 @@
             container.innerHTML = html;
         }
 
+        // 删除记录
         function deleteRecord(id) {
             if (confirm('确定要删除这条记录吗？')) {
                 const records = getRecords().filter(r => r.id !== id);
                 localStorage.setItem(storageKey, JSON.stringify(records));
-                showToast('记录已删除');
+                showToast('✓ 记录已删除');
                 updateUI();
             }
         }
 
+        // 显示统计信息
         function showStatistics() {
             const records = getRecords();
             if (records.length === 0) {
@@ -505,6 +652,7 @@
                 return;
             }
 
+            // 按分类统计
             const categoryStats = {};
             records.forEach(record => {
                 if (!categoryStats[record.category]) {
@@ -513,17 +661,17 @@
                 categoryStats[record.category] += record.amount;
             });
 
+            // 绘制图表
             const ctx = document.getElementById('categoryChart').getContext('2d');
-            const existingChart = Chart.instances.find(instance => instance.canvas === document.getElementById('categoryChart'));
-            if (existingChart) {
-                existingChart.destroy();
+            if (chartInstance) {
+                chartInstance.destroy();
             }
 
             const labels = Object.keys(categoryStats);
             const data = Object.values(categoryStats);
-            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384'];
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF'];
 
-            new Chart(ctx, {
+            chartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: labels,
@@ -545,14 +693,17 @@
                 }
             });
 
+            // 显示分类统计详情
             let statsHtml = '<h3 style="margin-bottom: 15px;">📊 分类消费统计</h3>';
+            const total = records.reduce((sum, r) => sum + r.amount, 0);
+            
             Object.entries(categoryStats).forEach(([category, amount]) => {
-                const percentage = ((amount / records.reduce((sum, r) => sum + r.amount, 0)) * 100).toFixed(1);
+                const percentage = ((amount / total) * 100).toFixed(1);
                 statsHtml += `
                     <div class="stat-item">
                         <span class="stat-label">${category}</span>
                         <span style="text-align: right;">
-                            <div>¥${amount.toFixed(2)}</div>
+                            <div style="font-weight: bold;">¥${amount.toFixed(2)}</div>
                             <div style="font-size: 12px; color: #999;">${percentage}%</div>
                         </span>
                     </div>
@@ -563,10 +714,12 @@
             document.getElementById('statisticsModal').classList.add('active');
         }
 
+        // 关闭统计
         function closeStatistics() {
             document.getElementById('statisticsModal').classList.remove('active');
         }
 
+        // 导出CSV
         function exportCSV() {
             const records = getRecords();
             if (records.length === 0) {
@@ -576,7 +729,7 @@
 
             let csv = '\ufeff日期,分类,金额,备注\n';
             records.forEach(record => {
-                csv += `${record.date},${record.category},${record.amount.toFixed(2)},"${record.note}"\n`;
+                csv += `${record.date},${record.category},${record.amount.toFixed(2)},"${record.note || ''}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -588,9 +741,10 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('数据已导出');
+            showToast('✓ 数据已导出');
         }
 
+        // 显示提示消息
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -601,6 +755,7 @@
             }, 3000);
         }
 
+        // 点击模态框外部关闭
         document.getElementById('statisticsModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeStatistics();
