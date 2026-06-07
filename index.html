@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>记账小程序 - Web版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4CAF50;
+            --danger-color: #f44336;
+            --info-color: #2196F3;
+            --light-bg: #f5f5f5;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'PingFang SC', sans-serif;
+            background-color: var(--light-bg);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #45a049 100%);
+            color: white;
+            padding: 20px 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .stats-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light-bg);
+        }
+
+        .stat-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .table-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--light-bg);
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .amount {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: var(--info-color);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background-color: #da190b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 记账小程序</h1>
+            <p>轻松管理你的消费</p>
+        </div>
+
+        <div class="form-card">
+            <div class="form-title">📝 新增记录</div>
+            
+            <div class="form-row">
+                <div>
+                    <label for="date">日期</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div>
+                    <label for="amount">金额 (¥)</label>
+                    <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label for="category">分类</label>
+                    <select id="category" required>
+                        <option value="餐饮">🍜 餐饮</option>
+                        <option value="购物">🛍 购物</option>
+                        <option value="交通">🚗 交通</option>
+                        <option value="娱乐">🎶 娱乐</option>
+                        <option value="医疗">🏥 医疗</option>
+                        <option value="学习">📖 学习</option>
+                        <option value="其他">📄 其他</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="note">备注</label>
+                    <input type="text" id="note" placeholder="可不填">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="addRecord()">✓ 添加记录</button>
+                <button class="btn-secondary" onclick="showStatistics()">📊 统计分析</button>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <button class="btn-secondary" onclick="exportCSV()" style="width: 100%;">📥 导出数据</button>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stat-item">
+                <span class="stat-label">💰 总消费</span>
+                <span class="stat-value" id="totalAmount">¥0.00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">📄 记录数</span>
+                <span class="stat-value" id="recordCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">📋 平均消费</span>
+                <span class="stat-value" id="averageAmount">¥0.00</span>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-title">📊 消费记录</div>
+            <div id="tableContainer"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="statisticsModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px;">📊 统计分析</h2>
+            <canvas id="categoryChart" style="max-height: 300px;"></canvas>
+            <div id="categoryStats" style="margin-top: 20px;"></div>
+            <button class="btn-primary" onclick="closeStatistics()" style="width: 100%; margin-top: 20px;">关闭</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        const storageKey = 'expense_records';
+        
+        window.addEventListener('load', function() {
+            const dateInput = document.getElementById('date');
+            if (!dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+            updateUI();
+        });
+
+        function addRecord() {
+            const date = document.getElementById('date').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const note = document.getElementById('note').value;
+
+            if (!date || !amount || amount <= 0) {
+                showToast('请填写完整信息', 'error');
+                return;
+            }
+
+            const records = getRecords();
+            records.push({
+                id: Date.now(),
+                date,
+                amount,
+                category,
+                note,
+                timestamp: new Date().toLocaleString('zh-CN')
+            });
+
+            localStorage.setItem(storageKey, JSON.stringify(records));
+            showToast('记录已添加');
+            
+            document.getElementById('amount').value = '';
+            document.getElementById('note').value = '';
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            
+            updateUI();
+        }
+
+        function getRecords() {
+            const data = localStorage.getItem(storageKey);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function updateUI() {
+            const records = getRecords();
+            updateStats(records);
+            updateTable(records);
+        }
+
+        function updateStats(records) {
+            if (records.length === 0) {
+                document.getElementById('totalAmount').textContent = '¥0.00';
+                document.getElementById('recordCount').textContent = '0';
+                document.getElementById('averageAmount').textContent = '¥0.00';
+                return;
+            }
+
+            const total = records.reduce((sum, r) => sum + r.amount, 0);
+            const average = total / records.length;
+
+            document.getElementById('totalAmount').textContent = `¥${total.toFixed(2)}`;
+            document.getElementById('recordCount').textContent = records.length;
+            document.getElementById('averageAmount').textContent = `¥${average.toFixed(2)}`;
+        }
+
+        function updateTable(records) {
+            const container = document.getElementById('tableContainer');
+
+            if (records.length === 0) {
+                container.innerHTML = '<div class="empty-state">📋 暂无记录，添加你的第一条消费记录</div>';
+                return;
+            }
+
+            const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>分类</th>
+                            <th class="amount">金额</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sortedRecords.forEach(record => {
+                html += `
+                    <tr>
+                        <td>${record.date}</td>
+                        <td><span class="category-badge">${record.category}</span></td>
+                        <td class="amount">¥${record.amount.toFixed(2)}</td>
+                        <td>${record.note || '-'}</td>
+                        <td><button class="btn-danger" onclick="deleteRecord(${record.id})">×</button></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function deleteRecord(id) {
+            if (confirm('确定要删除这条记录吗？')) {
+                const records = getRecords().filter(r => r.id !== id);
+                localStorage.setItem(storageKey, JSON.stringify(records));
+                showToast('记录已删除');
+                updateUI();
+            }
+        }
+
+        function showStatistics() {
+            const records = getRecords();
+            if (records.length === 0) {
+                showToast('暂无数据可显示', 'error');
+                return;
+            }
+
+            const categoryStats = {};
+            records.forEach(record => {
+                if (!categoryStats[record.category]) {
+                    categoryStats[record.category] = 0;
+                }
+                categoryStats[record.category] += record.amount;
+            });
+
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const existingChart = Chart.instances.find(instance => instance.canvas === document.getElementById('categoryChart'));
+            if (existingChart) {
+                existingChart.destroy();
+            }
+
+            const labels = Object.keys(categoryStats);
+            const data = Object.values(categoryStats);
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384'];
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            let statsHtml = '<h3 style="margin-bottom: 15px;">📊 分类消费统计</h3>';
+            Object.entries(categoryStats).forEach(([category, amount]) => {
+                const percentage = ((amount / records.reduce((sum, r) => sum + r.amount, 0)) * 100).toFixed(1);
+                statsHtml += `
+                    <div class="stat-item">
+                        <span class="stat-label">${category}</span>
+                        <span style="text-align: right;">
+                            <div>¥${amount.toFixed(2)}</div>
+                            <div style="font-size: 12px; color: #999;">${percentage}%</div>
+                        </span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('categoryStats').innerHTML = statsHtml;
+            document.getElementById('statisticsModal').classList.add('active');
+        }
+
+        function closeStatistics() {
+            document.getElementById('statisticsModal').classList.remove('active');
+        }
+
+        function exportCSV() {
+            const records = getRecords();
+            if (records.length === 0) {
+                showToast('没有数据可导出', 'error');
+                return;
+            }
+
+            let csv = '\ufeff日期,分类,金额,备注\n';
+            records.forEach(record => {
+                csv += `${record.date},${record.category},${record.amount.toFixed(2)},"${record.note}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `expense_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('数据已导出');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.getElementById('statisticsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStatistics();
+            }
+        });
+    </script>
+</body>
+</html>
